@@ -1,0 +1,165 @@
+---
+interface Props {
+  Item: string;
+  Desc?: string;
+  Price?: string;
+  Thumbnail?: string;
+  Active?: string;
+}
+
+const { Item, Desc, Price, Thumbnail } = Astro.props;
+
+// Create slug from item name
+const slug = Item.toLowerCase()
+  .replace(/\s+/g, '')  // Remove spaces
+  .replace(/[^a-z0-9]/gi, ''); // Remove special characters
+---
+
+<a href={`/${slug}`} class="box-card-link">
+  <div class="box-card">
+    {Thumbnail && (
+      <div class="thumbnail-container">
+        <img
+          src={Thumbnail}
+          alt={Item}
+          class="thumbnail"
+          loading="lazy"
+        />
+      </div>
+    )}
+
+    <div class="content">
+      <h3 class="item-name">{Item}</h3>
+
+      {Desc && (
+        <p class="description">{Desc}</p>
+      )}
+
+      {Price && (
+        <div class="price">{Price}</div>
+      )}
+
+      <div class="view-details">
+        Click to view details →
+      </div>
+    </div>
+  </div>
+</a>
+
+<style>
+  .box-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .box-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e5e7eb;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .box-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .thumbnail-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: #f3f4f6;
+  }
+
+  .thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .box-card:hover .thumbnail {
+    transform: scale(1.05);
+  }
+
+  .content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 200px);
+  }
+
+  .item-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.3;
+  }
+
+  .description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+    flex-grow: 1;
+  }
+
+  .price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #059669;
+    background: #ecfdf5;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+
+  .view-details {
+    color: #3b82f6;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    text-align: center;
+    margin-top: auto;
+  }
+
+  .box-card:hover .view-details {
+    opacity: 1;
+  }
+
+  /* Fallback styles when no thumbnail */
+  .box-card:not(:has(.thumbnail-container)) .content {
+    padding: 2rem 1.5rem;
+    height: 100%;
+  }
+
+  .box-card:not(:has(.thumbnail-container)) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .box-card:not(:has(.thumbnail-container)) .item-name {
+    color: white;
+  }
+
+  .box-card:not(:has(.thumbnail-container)) .description {
+    color: #e5e7eb;
+  }
+
+  .box-card:not(:has(.thumbnail-container)) .price {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .box-card:not(:has(.thumbnail-container)) .view-details {
+    color: #e5e7eb;
+  }
+</style>
