@@ -15,6 +15,10 @@
     {
       "pattern": "copper.horse",
       "custom_domain": true
+    },
+    {
+      "pattern": "www.copper.horse",
+      "custom_domain": true
     }
   ]
 }
