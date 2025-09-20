@@ -59,9 +59,9 @@ const getNextSlide = (currentIndex: number, totalSlides: number) => {
 				<!-- Placeholder to get the right height-->
 				<img
 					src={images[0]}
-					alt={``}
 					class="carousel__image"
 				/>
+				{images.length > 1 && (
 				<ol class="carousel__viewport">
 					{images.map((image, index) => (
 						<li
@@ -93,7 +93,7 @@ const getNextSlide = (currentIndex: number, totalSlides: number) => {
 						</li>
 					))}
 				</ol>
-				{images.length > 1 && (
+
 				<aside class="carousel__navigation">
 					<ol class="carousel__navigation-list">
 						{images.map((_, index) => (
@@ -449,3 +449,34 @@ const getNextSlide = (currentIndex: number, totalSlides: number) => {
 		display: none;
 	}
 </style>
+
+<script>
+	// Prevent default scroll behavior for carousel links
+	document.addEventListener('DOMContentLoaded', function() {
+		const carouselLinks = document.querySelectorAll('.carousel a[href^="#carousel__slide"]');
+
+		carouselLinks.forEach(link => {
+			link.addEventListener('click', function(e) {
+				e.preventDefault();
+
+				const targetId = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+
+				if (!targetId) return; // Add null check
+
+				const targetElement = document.querySelector(targetId) as HTMLElement;
+
+				if (targetElement) {
+					// Scroll the carousel viewport to the target slide
+					const viewport = document.querySelector('.carousel__viewport') as HTMLElement;
+					const slideIndex = parseInt(targetId.replace('#carousel__slide', '')) - 1;
+					const slideWidth = viewport.scrollWidth / document.querySelectorAll('.carousel__slide').length;
+
+					viewport.scrollTo({
+						left: slideIndex * slideWidth,
+						behavior: 'smooth'
+					});
+				}
+			});
+		});
+	});
+</script>
