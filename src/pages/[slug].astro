@@ -17,6 +17,7 @@ type Box = {
 	Thumbnail?: string;
 	Desc?: string;
 	Price?: string;
+	Images?: string;
 	// Add other fields as needed
 };
 
@@ -35,22 +36,80 @@ const box = boxes.find(
 if (!box) {
 	return Astro.redirect("/404");
 }
+
+let images = box.Images?.split(',').map(url => url.trim()).filter(url => url) || [];
+// If no images in the Images field, use thumbnail as fallback
+images = images.length > 0 ? images : (box.Thumbnail ? [box.Thumbnail] : []);
+
+// Helper function to get previous slide index
+const getPrevSlide = (currentIndex: number, totalSlides: number) => {
+	return currentIndex === 0 ? totalSlides - 1 : currentIndex - 1;
+};
+
+// Helper function to get next slide index
+const getNextSlide = (currentIndex: number, totalSlides: number) => {
+	return currentIndex === totalSlides - 1 ? 0 : currentIndex + 1;
+};
 ---
 
 <Layout>
 	<div class="item-detail-container min-h-screen p-[2rem]">
 		<div class="item-detail">
-			{
-				box.Thumbnail && (
-					<div class="image-container">
-						<img
-							src={box.Thumbnail}
-							alt={box.Item}
-							class="detail-image"
-						/>
-					</div>
-				)
-			}
+			<section class={`carousel ${images.length <= 1 ? 'single-image' : ''}`} aria-label="Gallery">
+				<!-- Placeholder to get the right height-->
+				<img
+					src={images[0]}
+					alt={``}
+					class="carousel__image"
+				/>
+				<ol class="carousel__viewport">
+					{images.map((image, index) => (
+						<li
+							id={`carousel__slide${index + 1}`}
+							tabindex="0"
+							class="carousel__slide"
+						>
+							<div class="carousel__snapper">
+								<img
+									src={image}
+									alt={`${box.Item} - Image ${index + 1}`}
+									class="carousel__image"
+								/>
+								{images.length > 1 && (
+								<a
+									href={`#carousel__slide${getPrevSlide(index, images.length) + 1}`}
+									class="carousel__prev"
+								>
+									Go to {index === 0 ? 'last' : 'previous'} slide
+								</a>
+								<a
+									href={`#carousel__slide${getNextSlide(index, images.length) + 1}`}
+									class="carousel__next"
+								>
+									Go to {index === images.length - 1 ? 'first' : 'next'} slide
+								</a>
+								)}
+							</div>
+						</li>
+					))}
+				</ol>
+				{images.length > 1 && (
+				<aside class="carousel__navigation">
+					<ol class="carousel__navigation-list">
+						{images.map((_, index) => (
+							<li class="carousel__navigation-item">
+								<a
+									href={`#carousel__slide${index + 1}`}
+									class="carousel__navigation-button"
+								>
+									Go to slide {index + 1}
+								</a>
+							</li>
+						))}
+					</ol>
+				</aside>
+				)}
+			</section>
 
 			<div class="detail-content justify-between">
 				<div class="detail-main">
@@ -221,34 +280,172 @@ if (!box) {
 			text-align: center;
 		}
 	}
+</style>
 
-	/* Handle cases without thumbnail */
-	.item-detail:not(:has(.image-container)) {
-		grid-template-columns: 1fr;
-		max-width: 600px;
+<style>
+
+
+	@keyframes snap {
+		96% {
+			scroll-snap-align: center;
+		}
+		97% {
+			scroll-snap-align: none;
+		}
+		99% {
+			scroll-snap-align: none;
+		}
+		100% {
+			scroll-snap-align: center;
+		}
 	}
 
-	.item-detail:not(:has(.image-container)) .detail-content {
-		padding: 4rem 3rem;
-		text-align: center;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
+
+	ol, li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
 	}
 
-	.item-detail:not(:has(.image-container)) .item-title {
-		color: white;
+	.carousel {
+	position: relative;
+
+	filter: drop-shadow(0 0 10px #0003);
+	perspective: 100px;
 	}
 
-	.item-detail:not(:has(.image-container)) .description-section h2 {
-		color: #e5e7eb;
+	.carousel__viewport {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	overflow-x: scroll;
+	counter-reset: item;
+	scroll-behavior: smooth;
+	scroll-snap-type: x mandatory;
 	}
 
-	.item-detail:not(:has(.image-container)) .description {
-		color: #e5e7eb;
+	.carousel__slide {
+	position: relative;
+	flex: 0 0 100%;
+	width: 100%;
+	counter-increment: item;
 	}
 
-	.item-detail:not(:has(.image-container)) .price {
-		background: rgba(255, 255, 255, 0.2);
-		color: white;
+	.carousel__slide:nth-child(even) {
+	}
+
+	.carousel__snapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	scroll-snap-align: center;
+	}
+
+	@media (hover: hover) {
+	.carousel__snapper {
+		animation-name: tonext, snap;
+		animation-timing-function: ease;
+		animation-duration: 4s;
+		animation-iteration-count: infinite;
+	}
+
+	.carousel__slide:last-child .carousel__snapper {
+		animation-name: tostart, snap;
+	}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+	.carousel__snapper {
+		animation-name: none;
+	}
+	}
+
+	.carousel:hover .carousel__snapper,
+	.carousel:focus-within .carousel__snapper {
+	animation-name: none;
+	}
+
+	.carousel__navigation {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	text-align: center;
+	}
+
+	.carousel__navigation-list,
+	.carousel__navigation-item {
+	display: inline-block;
+	}
+
+	.carousel__navigation-button {
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	background-color: #333;
+	background-clip: content-box;
+	border: 0.25rem solid transparent;
+	border-radius: 50%;
+	font-size: 0;
+	transition: transform 0.1s;
+	}
+
+	.carousel::before,
+	.carousel::after,
+	.carousel__prev,
+	.carousel__next {
+	position: absolute;
+	top: 0;
+	margin-top: 37.5%;
+	width: 4rem;
+	height: 4rem;
+	transform: translateY(-50%);
+	border-radius: 50%;
+	font-size: 0;
+	outline: 0;
+	}
+
+	.carousel::before,
+	.carousel__prev {
+	left: -1rem;
+	}
+
+	.carousel::after,
+	.carousel__next {
+	right: -1rem;
+	}
+
+	.carousel::before,
+	.carousel::after {
+	content: '';
+	z-index: 1;
+	background-color: #333;
+	background-size: 1.5rem 1.5rem;
+	background-repeat: no-repeat;
+	background-position: center center;
+	color: #fff;
+	font-size: 2.5rem;
+	line-height: 4rem;
+	text-align: center;
+	pointer-events: none;
+	}
+
+	.carousel::before {
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,50 80,100 80,0' fill='%23fff'/%3E%3C/svg%3E");
+	}
+
+	.carousel::after {
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='100,50 20,100 20,0' fill='%23fff'/%3E%3C/svg%3E");
+	}
+
+	/* Hide navigation arrows when there's only one image */
+	.carousel.single-image::before,
+	.carousel.single-image::after {
+		display: none;
 	}
 </style>
