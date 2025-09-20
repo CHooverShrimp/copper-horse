@@ -1,10 +1,21 @@
 ---
 import "@styles/global.css";
+import type { SEO } from '@data/SEO';
+import Seo from '@components/SEO.astro';
+
+interface Props {
+  title?: string;
+  backgroundClass?: string; // Optional class for various backgrounds
+  seo?: SEO;
+}
+
+const { title = "Metalcast Mares - Copper Horse", seo }: Props = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
+		<Seo seo={seo} />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -13,7 +24,7 @@ import "@styles/global.css";
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&family=Rubik+Mono+One&display=swap" rel="stylesheet">
-		<title>Metalcast Mares - Copper Horse</title>
+		<title>{title}</title>
 	</head>
 	<body class="bg-neutral-900 reddit-sans">
 		<div id="header" class="shadow-xl bg-neutral-950 py-10">

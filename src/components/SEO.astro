@@ -1,0 +1,32 @@
+---
+import type { SEO } from '@data/SEO';
+
+interface Props {
+  seo?: SEO;
+}
+
+// Default data if no SEO is passed in
+const defaultSEO: SEO = {
+    site: 'https://www.copper.horse',
+    site_name: "Metalcast Mares - Copper Horse",
+    title: "Metalcast Mares - Copper Horse",
+    image: 'https://treebrary.pone.social/accounts/headers/113/682/998/416/339/494/original/7c045bba330aa9c0.jpeg',
+    description:
+    `We make cool pony copper stuffs ^:)`
+};
+
+const { seo = defaultSEO }: Props = Astro.props;
+---
+<!-- seo metadata -->
+<meta property="og:title" content={seo.title} />
+<meta property="og:description" content={seo.description} />
+<meta property="og:image" content={seo.image ?? 'https://treebrary.pone.social/accounts/headers/113/682/998/416/339/494/original/7c045bba330aa9c0.jpeg'} />
+<meta property="og:url" content={seo.site} />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={seo.site_name} />
+<meta property="og:image:alt" content="crocs image" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={seo.description} />
+<meta name="twitter:description" content={seo.description} />
+<meta name="twitter:image" content={seo.image} />
+<meta name="description" content={seo.description} />
