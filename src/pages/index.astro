@@ -17,6 +17,10 @@ const activeBoxes = boxes.filter((box: Box) => box.Active === "TRUE");
 ---
 
 <Layout>
+	<div id="filter" class="flex justify-center gap-4 py-4">
+		<input type="checkbox" name="toggleDisplayOnly" id="toggleDisplayOnly-toggle" class="hidden peer">
+		<label for="toggleDisplayOnly-toggle" class="cursor-pointer p-2 text-white bg-lime-900 rounded peer-checked:bg-lime-950 hover:scale-105 transition duration-100">Display Only</label>
+	</div>
 	<div class="grid grid-container">
 		{activeBoxes.map(box => (
 			<BoxComponent Item={box.Item} {...box} />
@@ -40,3 +44,34 @@ const activeBoxes = boxes.filter((box: Box) => box.Active === "TRUE");
 			padding: 1rem;
 		}
 	}
+</style>
+
+
+<script>
+  const checkbox = document.getElementById("toggleDisplayOnly-toggle") as HTMLInputElement;
+  console.log("HELLO");
+
+  checkbox.addEventListener("change", () => {
+    console.log("TICKING");
+    const isChecked = checkbox.checked;
+
+    // Debug: log what we're finding
+    const notForSaleElements = document.querySelectorAll(".NotForSale");
+    console.log("Found NotForSale elements:", notForSaleElements.length);
+
+    // show/hide NotForSale items based on checkbox state
+    notForSaleElements.forEach((link, index) => {
+      console.log(`Element ${index}:`, link.className);
+
+      if (isChecked) {
+        // Force hide with display none
+        (link as HTMLElement).style.display = "none";
+        console.log(`Hiding element ${index}`);
+      } else {
+        // Show by removing the inline style
+        (link as HTMLElement).style.display = "";
+        console.log(`Showing element ${index}`);
+      }
+    });
+  });
+</script>

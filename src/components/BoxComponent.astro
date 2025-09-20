@@ -15,7 +15,7 @@ const slug = Item.toLowerCase()
   .replace(/[^a-z0-9]/gi, ''); // Remove special characters
 ---
 
-<a href={`/${slug}`} class="box-card-link">
+<a href={`/${slug}`} class=`box-card-link ${Price ? '' : 'NotForSale'}`>
   <div class="box-card">
     {Thumbnail && (
       <div class="thumbnail-container">
